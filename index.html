@@ -5,10 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Avaliação do Uso do Mouse</title>
 <style>
-    * {
-        box-sizing: border-box;
-        user-select: none;
-    }
+    * { box-sizing: border-box; user-select: none; }
 
     body {
         margin: 0;
@@ -29,10 +26,7 @@
         box-shadow: 0 3px 10px rgba(0,0,0,.25);
     }
 
-    header h1 {
-        margin: 0;
-        font-size: 27px;
-    }
+    header h1 { margin: 0; font-size: 27px; }
 
     .painel {
         display: flex;
@@ -84,7 +78,7 @@
         justify-content: center;
         flex-direction: column;
         text-align: center;
-        z-index: 40;
+        z-index: 50;
         padding: 28px;
     }
 
@@ -147,15 +141,8 @@
         animation: pulsar .8s infinite alternate;
     }
 
-    .alvoPequeno {
-        width: 54px;
-        height: 54px;
-    }
-
-    .alvoMini {
-        width: 38px;
-        height: 38px;
-    }
+    .alvoPequeno { width: 54px; height: 54px; }
+    .alvoMini { width: 38px; height: 38px; }
 
     @keyframes pulsar {
         from { transform: scale(1); }
@@ -292,6 +279,44 @@
         top: 35px;
     }
 
+    .objetoConduzir {
+        position: absolute;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: #ffb703;
+        border: 4px solid #fb8500;
+        box-shadow: 0 4px 10px rgba(0,0,0,.25);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        z-index: 8;
+        pointer-events: none;
+    }
+
+    .areaConducao {
+        position: absolute;
+        inset: 0;
+        cursor: none;
+        z-index: 7;
+    }
+
+    .dicaConducao {
+        position: absolute;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        background: #fff3cd;
+        border: 3px solid #ffb703;
+        border-radius: 16px;
+        padding: 10px 18px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #5c4200;
+        z-index: 12;
+    }
+
     .mensagem {
         position: absolute;
         left: 50%;
@@ -303,7 +328,7 @@
         border-radius: 20px;
         font-size: 30px;
         font-weight: bold;
-        z-index: 30;
+        z-index: 40;
         text-align: center;
         box-shadow: 0 8px 20px rgba(0,0,0,.3);
         display: none;
@@ -319,9 +344,7 @@
         color: #555;
     }
 
-    .erroTela {
-        animation: erro .25s;
-    }
+    .erroTela { animation: erro .25s; }
 
     @keyframes erro {
         0%,100% { background: white; }
@@ -369,12 +392,7 @@
 
     @media (max-width: 850px) {
         body { overflow: auto; }
-        header {
-            height: auto;
-            flex-direction: column;
-            gap: 8px;
-        }
-
+        header { height: auto; flex-direction: column; gap: 8px; }
         header h1 { font-size: 21px; }
         .painel { font-size: 14px; justify-content: center; }
         .instrucoes { font-size: 18px; }
@@ -391,10 +409,10 @@
     <h1>Avaliação Escolar: Domínio do Mouse</h1>
     <div class="painel">
         <span>Aluno: <strong id="alunoPainel">---</strong></span>
-        <span>Fase: <strong id="fase">0</strong>/10</span>
+        <span>Fase: <strong id="fase">0</strong>/11</span>
         <span>Pontos: <strong id="pontos">0</strong></span>
         <span>Erros: <strong id="erros">0</strong></span>
-        <span>Tempo: <strong id="tempo">180</strong>s</span>
+        <span>Tempo: <strong id="tempo">210</strong>s</span>
         <span>Nota: <strong id="nota">0,00</strong>/2,00</span>
     </div>
 </header>
@@ -404,12 +422,8 @@
     <div id="areaJogo">
         <div class="telaInicial" id="telaInicial">
             <h2>🖱️ Avaliação do Uso do Mouse</h2>
-            <p>
-                O aluno poderá tentar várias vezes durante a atividade. O jogo registra pontos, erros e transforma o desempenho em nota de 0 a 2,00.
-            </p>
-            <p>
-                Habilidades avaliadas: clique simples, clique duplo, precisão, selecionar, arrastar e controle do ponteiro.
-            </p>
+            <p>O aluno poderá tentar várias vezes durante a atividade. O jogo registra pontos, erros e transforma o desempenho em nota de 0 a 2,00.</p>
+            <p>Habilidades avaliadas: clique simples, clique duplo, precisão, selecionar, arrastar e controle do ponteiro.</p>
 
             <div class="campoNome">
                 <label for="nomeAluno">Nome:</label>
@@ -440,7 +454,7 @@ let nomeAluno = "";
 let fase = 0;
 let pontos = 0;
 let erros = 0;
-let tempo = 180;
+let tempo = 210;
 let intervaloTempo;
 let acertosNaFase = 0;
 let arrastando = null;
@@ -448,13 +462,13 @@ let offsetX = 0;
 let offsetY = 0;
 let dentroDoCaminho = false;
 
-const PONTOS_MAXIMOS = 500;
+const PONTOS_MAXIMOS = 560;
 
 const criterios = {
     clique: {nome: "Clique simples", max: 50, pontos: 0, erros: 0},
     precisao: {nome: "Precisão", max: 130, pontos: 0, erros: 0},
     duplo: {nome: "Clique duplo", max: 60, pontos: 0, erros: 0},
-    selecionar: {nome: "Selecionar", max: 80, pontos: 0, erros: 0},
+    selecionar: {nome: "Selecionar", max: 140, pontos: 0, erros: 0},
     arrastar: {nome: "Arrastar", max: 130, pontos: 0, erros: 0},
     controle: {nome: "Controle do ponteiro", max: 50, pontos: 0, erros: 0}
 };
@@ -468,7 +482,7 @@ function iniciarJogo() {
     pontos = 0;
     erros = 0;
     fase = 0;
-    tempo = 180;
+    tempo = 210;
 
     Object.keys(criterios).forEach(k => {
         criterios[k].pontos = 0;
@@ -481,9 +495,7 @@ function iniciarJogo() {
     intervaloTempo = setInterval(() => {
         tempo--;
         tempoEl.textContent = tempo;
-        if (tempo <= 0) {
-            finalizarJogo(false);
-        }
+        if (tempo <= 0) finalizarJogo(false);
     }, 1000);
 
     proximaFase();
@@ -491,12 +503,11 @@ function iniciarJogo() {
 
 function limparArea() {
     [...area.children].forEach(el => {
-        if (el.id !== "telaInicial" && el.id !== "mensagem") {
-            el.remove();
-        }
+        if (el.id !== "telaInicial" && el.id !== "mensagem") el.remove();
     });
     mensagem.style.display = "none";
     area.classList.remove("erroTela");
+    area.onclick = null;
     area.onmousemove = null;
     area.onmousedown = null;
     area.onmouseup = null;
@@ -538,9 +549,7 @@ function registrarErro(categoria) {
 function mostrarMensagem(texto, tempoMsg = 900) {
     mensagem.innerHTML = texto;
     mensagem.style.display = "block";
-    setTimeout(() => {
-        mensagem.style.display = "none";
-    }, tempoMsg);
+    setTimeout(() => mensagem.style.display = "none", tempoMsg);
 }
 
 function posicaoAleatoria(tamanho = 90) {
@@ -573,8 +582,9 @@ function proximaFase() {
     else if (fase === 6) faseArrastar1();
     else if (fase === 7) faseArrastar2();
     else if (fase === 8) faseArrastar3();
-    else if (fase === 9) fasePrecisao2();
-    else if (fase === 10) faseLabirinto();
+    else if (fase === 9) faseSelecionar3();
+    else if (fase === 10) fasePrecisaoConduzir();
+    else if (fase === 11) faseLabirinto();
     else finalizarJogo(true);
 }
 
@@ -588,12 +598,6 @@ function fasePrecisao1() {
     instrucoes.textContent = "Fase 2: clique nos alvos menores. O objetivo é ter precisão.";
     criarEtiqueta("Habilidade: precisão");
     criarAlvo(7, "pequeno", "precisao", 10);
-}
-
-function fasePrecisao2() {
-    instrucoes.textContent = "Fase 9: clique nos mini-alvos. Esta é a fase mais difícil de precisão.";
-    criarEtiqueta("Habilidade: precisão avançada");
-    criarAlvo(6, "mini", "precisao", 10);
 }
 
 function criarAlvo(total, tamanho, categoria, valor) {
@@ -629,10 +633,7 @@ function criarAlvo(total, tamanho, categoria, valor) {
         }
     };
 
-    area.onclick = () => {
-        registrarErro(categoria);
-    };
-
+    area.onclick = () => registrarErro(categoria);
     area.appendChild(alvo);
 }
 
@@ -676,7 +677,7 @@ function faseSelecionar1() {
     instrucoes.textContent = "Fase 4: selecione apenas os itens pedidos: TECLADO, MOUSE e MONITOR.";
     criarEtiqueta("Habilidade: selecionar itens corretos");
     const itens = [
-        ["TECLADO", true, 10, 80],
+        ["TECLADO", true, 70, 80],
         ["CADERNO", false, 250, 80],
         ["MOUSE", true, 460, 80],
         ["LÁPIS", false, 680, 80],
@@ -701,6 +702,21 @@ function faseSelecionar2() {
     criarSelecao(itens, 3, "selecionar", 14);
 }
 
+function faseSelecionar3() {
+    instrucoes.textContent = "Fase 9: selecione somente as ações feitas com o mouse.";
+    criarEtiqueta("Habilidade: selecionar por leitura");
+    const itens = [
+        ["CLICAR", true, 70, 70],
+        ["DIGITAR", false, 245, 70],
+        ["ARRASTAR", true, 430, 70],
+        ["FALAR", false, 635, 70],
+        ["SELECIONAR", true, 110, 220],
+        ["OUVIR", false, 340, 220],
+        ["CLIQUE DUPLO", true, 535, 220]
+    ];
+    criarSelecao(itens, 4, "selecionar", 15);
+}
+
 function criarSelecao(itens, totalCorretos, categoria, valor) {
     itens.forEach(([texto, correto, x, y]) => {
         const div = document.createElement("div");
@@ -713,7 +729,6 @@ function criarSelecao(itens, totalCorretos, categoria, valor) {
 
         div.onclick = () => {
             if (div.dataset.marcado === "sim") return;
-
             div.dataset.marcado = "sim";
 
             if (div.dataset.correto === "sim") {
@@ -775,7 +790,7 @@ function faseArrastar2() {
         caixa.style.top = y + "px";
         caixa.dataset.tipo = tipo;
         caixa.dataset.ok = "nao";
-        prepararArraste(caixa, true);
+        prepararArraste(caixa);
         area.appendChild(caixa);
     });
 
@@ -786,13 +801,9 @@ function faseArrastar3() {
     instrucoes.textContent = "Fase 8: arraste os objetos pequenos para as áreas verdes. Exige mais precisão.";
     criarEtiqueta("Habilidade: arrastar com precisão");
 
-    const posZonas = [
-        [620, 55],
-        [620, 235],
-        [430, 145]
-    ];
+    const posZonas = [[620, 55], [620, 235], [430, 145]];
 
-    posZonas.forEach((pos, i) => {
+    posZonas.forEach((pos) => {
         const z = document.createElement("div");
         z.className = "zona zonaPequena";
         z.textContent = "Solte aqui";
@@ -814,7 +825,7 @@ function faseArrastar3() {
         caixa.style.top = (75 + i * 110) + "px";
         caixa.dataset.ok = "nao";
         caixa.dataset.tipo = "livre";
-        prepararArraste(caixa, false);
+        prepararArraste(caixa);
         area.appendChild(caixa);
     });
 
@@ -838,14 +849,14 @@ function criarArrastarEmoji(emojis, zonasPequenas, categoria, valor) {
         caixa.style.top = (75 + i * 120) + "px";
         caixa.dataset.ok = "nao";
         caixa.dataset.tipo = "livre";
-        prepararArraste(caixa, false);
+        prepararArraste(caixa);
         area.appendChild(caixa);
     });
 
     ativarSoltarLivre(categoria, valor, emojis.length);
 }
 
-function prepararArraste(caixa, texto) {
+function prepararArraste(caixa) {
     caixa.onmousedown = (e) => {
         if (caixa.dataset.ok === "sim") return;
         arrastando = caixa;
@@ -913,15 +924,12 @@ function ativarSoltarPorTipo(categoria, valor, total) {
 
         const zonas = [...document.querySelectorAll(".zona")];
         const r1 = arrastando.getBoundingClientRect();
-
         let zonaCorreta = false;
 
         zonas.forEach(zona => {
             const r2 = zona.getBoundingClientRect();
             const dentro = !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
-            if (dentro && zona.dataset.tipo === arrastando.dataset.tipo) {
-                zonaCorreta = true;
-            }
+            if (dentro && zona.dataset.tipo === arrastando.dataset.tipo) zonaCorreta = true;
         });
 
         if (zonaCorreta && arrastando.dataset.ok === "nao") {
@@ -948,8 +956,79 @@ function ativarSoltarPorTipo(categoria, valor, total) {
     };
 }
 
+function fasePrecisaoConduzir() {
+    instrucoes.textContent = "Fase 10: conduza a bolinha amarela até os círculos azuis, sem clicar.";
+    criarEtiqueta("Habilidade: precisão com condução");
+
+    const dica = document.createElement("div");
+    dica.className = "dicaConducao";
+    dica.textContent = "Mexa o mouse devagar e leve a bolinha até cada alvo azul.";
+    area.appendChild(dica);
+
+    const camada = document.createElement("div");
+    camada.className = "areaConducao";
+    area.appendChild(camada);
+
+    const bola = document.createElement("div");
+    bola.className = "objetoConduzir";
+    bola.textContent = "●";
+    bola.style.left = "80px";
+    bola.style.top = "90px";
+    area.appendChild(bola);
+
+    let alvoAtual = 0;
+    const posicoes = [
+        [250, 90],
+        [520, 115],
+        [360, 260],
+        [680, 300],
+        [170, 360],
+        [760, 155]
+    ];
+
+    function criarAlvoConducao() {
+        const alvo = document.createElement("div");
+        alvo.className = "alvo alvoPequeno";
+        alvo.style.left = posicoes[alvoAtual][0] + "px";
+        alvo.style.top = posicoes[alvoAtual][1] + "px";
+        alvo.style.zIndex = "6";
+        area.appendChild(alvo);
+        return alvo;
+    }
+
+    let alvo = criarAlvoConducao();
+
+    camada.onmousemove = (e) => {
+        const rect = area.getBoundingClientRect();
+        const x = e.clientX - rect.left - 27;
+        const y = e.clientY - rect.top - 27;
+
+        bola.style.left = x + "px";
+        bola.style.top = y + "px";
+
+        const rb = bola.getBoundingClientRect();
+        const ra = alvo.getBoundingClientRect();
+        const tocou = !(rb.right < ra.left || rb.left > ra.right || rb.bottom < ra.top || rb.top > ra.bottom);
+
+        if (tocou) {
+            adicionarPontos("precisao", 10);
+            alvo.remove();
+            alvoAtual++;
+
+            if (alvoAtual >= posicoes.length) {
+                mostrarMensagem("Precisão concluída! 🎯");
+                setTimeout(proximaFase, 850);
+            } else {
+                alvo = criarAlvoConducao();
+            }
+        }
+    };
+
+    camada.onclick = () => registrarErro("precisao");
+}
+
 function faseLabirinto() {
-    instrucoes.textContent = "Fase 10: leve o mouse do INÍCIO até o FIM sem sair do caminho azul.";
+    instrucoes.textContent = "Fase 11: conduza o mouse do INÍCIO até o FIM sem sair do caminho azul.";
     criarEtiqueta("Habilidade: controle do ponteiro");
 
     const lab = document.createElement("div");
@@ -1076,7 +1155,7 @@ function finalizarJogo(concluiu = false) {
 
     area.appendChild(telaFinal);
     instrucoes.textContent = "Resultado da atividade avaliativa.";
-    faseEl.textContent = "10";
+    faseEl.textContent = "11";
     notaEl.textContent = formatarNota(notaFinal);
 }
 </script>
