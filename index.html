@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaliação do Uso do Mouse</title>
+<style>
+    * {
+        box-sizing: border-box;
+        user-select: none;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+        background: linear-gradient(135deg, #dff3ff, #f7ecff);
+        color: #222;
+        overflow: hidden;
+    }
+
+    header {
+        height: 82px;
+        background: #243b73;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 26px;
+        box-shadow: 0 3px 10px rgba(0,0,0,.25);
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 27px;
+    }
+
+    .painel {
+        display: flex;
+        gap: 10px;
+        font-size: 17px;
+        font-weight: bold;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .painel span {
+        background: rgba(255,255,255,.17);
+        padding: 8px 12px;
+        border-radius: 12px;
+    }
+
+    main {
+        height: calc(100vh - 82px);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .instrucoes {
+        text-align: center;
+        padding: 12px;
+        font-size: 23px;
+        font-weight: bold;
+        color: #243b73;
+        min-height: 56px;
+    }
+
+    #areaJogo {
+        flex: 1;
+        margin: 0 26px 26px;
+        background: white;
+        border: 5px solid #243b73;
+        border-radius: 22px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0,0,0,.18);
+    }
+
+    .telaInicial, .telaFinal {
+        position: absolute;
+        inset: 0;
+        background: rgba(255,255,255,.97);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+        z-index: 40;
+        padding: 28px;
+    }
+
+    .telaInicial h2, .telaFinal h2 {
+        font-size: 42px;
+        color: #243b73;
+        margin: 0 0 10px;
+    }
+
+    .telaInicial p, .telaFinal p {
+        font-size: 22px;
+        max-width: 980px;
+        line-height: 1.42;
+        margin: 8px 0;
+    }
+
+    .campoNome {
+        margin: 12px 0 16px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    input[type="text"] {
+        font-size: 22px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 3px solid #243b73;
+        min-width: 360px;
+    }
+
+    button {
+        border: none;
+        background: #ffb703;
+        color: #222;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 15px 26px;
+        border-radius: 18px;
+        cursor: pointer;
+        box-shadow: 0 5px 0 #c98700;
+        transition: .1s;
+    }
+
+    button:active {
+        transform: translateY(4px);
+        box-shadow: 0 1px 0 #c98700;
+    }
+
+    .alvo {
+        position: absolute;
+        width: 82px;
+        height: 82px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #fff 0 18%, #ff4d6d 19% 43%, #fff 44% 57%, #2a9d8f 58%);
+        border: 4px solid #222;
+        cursor: pointer;
+        animation: pulsar .8s infinite alternate;
+    }
+
+    .alvoPequeno {
+        width: 54px;
+        height: 54px;
+    }
+
+    .alvoMini {
+        width: 38px;
+        height: 38px;
+    }
+
+    @keyframes pulsar {
+        from { transform: scale(1); }
+        to { transform: scale(1.08); }
+    }
+
+    .estrela {
+        position: absolute;
+        font-size: 58px;
+        cursor: pointer;
+        animation: girar 1.8s linear infinite;
+    }
+
+    @keyframes girar {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .caixa {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        background: #8ecae6;
+        border: 4px solid #126782;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 45px;
+        cursor: grab;
+        z-index: 5;
+    }
+
+    .caixaTexto {
+        width: 155px;
+        height: 72px;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        padding: 6px;
+    }
+
+    .zona {
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        border-radius: 22px;
+        border: 6px dashed #2a9d8f;
+        background: #e7fff9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 22px;
+        font-weight: bold;
+        color: #14746f;
+        padding: 8px;
+    }
+
+    .zonaPequena {
+        width: 128px;
+        height: 128px;
+        font-size: 18px;
+    }
+
+    .selecionavel {
+        position: absolute;
+        min-width: 120px;
+        min-height: 58px;
+        border-radius: 16px;
+        border: 4px solid #777;
+        background: #f1f1f1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 25px;
+        font-weight: bold;
+        padding: 10px 16px;
+        cursor: pointer;
+    }
+
+    .selecionado {
+        background: #caffbf !important;
+        border-color: #2a9d8f !important;
+        color: #064e3b;
+        transform: scale(1.04);
+    }
+
+    .errado {
+        background: #ffd6d6 !important;
+        border-color: #e63946 !important;
+    }
+
+    .labirinto {
+        position: absolute;
+        left: 8%;
+        top: 20%;
+        width: 84%;
+        height: 48%;
+        border-radius: 20px;
+        background: #f1f1f1;
+        border: 4px solid #333;
+    }
+
+    .caminho {
+        position: absolute;
+        background: #90e0ef;
+        border: 3px solid #0077b6;
+    }
+
+    .inicio, .fim {
+        position: absolute;
+        width: 88px;
+        height: 88px;
+        border-radius: 50%;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        font-weight: bold;
+        z-index: 3;
+    }
+
+    .inicio {
+        background: #2a9d8f;
+        left: 20px;
+        top: calc(50% - 44px);
+    }
+
+    .fim {
+        background: #e63946;
+        right: 20px;
+        top: 35px;
+    }
+
+    .mensagem {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: #243b73;
+        color: white;
+        padding: 22px 34px;
+        border-radius: 20px;
+        font-size: 30px;
+        font-weight: bold;
+        z-index: 30;
+        text-align: center;
+        box-shadow: 0 8px 20px rgba(0,0,0,.3);
+        display: none;
+    }
+
+    .rodape {
+        position: absolute;
+        bottom: 8px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 16px;
+        color: #555;
+    }
+
+    .erroTela {
+        animation: erro .25s;
+    }
+
+    @keyframes erro {
+        0%,100% { background: white; }
+        50% { background: #ffd6d6; }
+    }
+
+    .resumo {
+        border-collapse: collapse;
+        margin: 12px auto;
+        font-size: 18px;
+        min-width: 640px;
+        max-width: 900px;
+    }
+
+    .resumo th, .resumo td {
+        border: 2px solid #243b73;
+        padding: 8px 12px;
+        text-align: center;
+    }
+
+    .resumo th {
+        background: #243b73;
+        color: white;
+    }
+
+    .notaFinal {
+        font-size: 46px !important;
+        color: #1d3557;
+        font-weight: bold;
+    }
+
+    .etiqueta {
+        position: absolute;
+        top: 12px;
+        left: 16px;
+        background: #edf2fb;
+        color: #243b73;
+        border: 2px solid #243b73;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 18px;
+        z-index: 6;
+    }
+
+    @media (max-width: 850px) {
+        body { overflow: auto; }
+        header {
+            height: auto;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        header h1 { font-size: 21px; }
+        .painel { font-size: 14px; justify-content: center; }
+        .instrucoes { font-size: 18px; }
+        main { height: calc(100vh - 120px); }
+        button { font-size: 19px; }
+        input[type="text"] { min-width: 220px; font-size: 18px; }
+        .resumo { min-width: 300px; font-size: 14px; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Avaliação Escolar: Domínio do Mouse</h1>
+    <div class="painel">
+        <span>Aluno: <strong id="alunoPainel">---</strong></span>
+        <span>Fase: <strong id="fase">0</strong>/10</span>
+        <span>Pontos: <strong id="pontos">0</strong></span>
+        <span>Erros: <strong id="erros">0</strong></span>
+        <span>Tempo: <strong id="tempo">180</strong>s</span>
+        <span>Nota: <strong id="nota">0,00</strong>/2,00</span>
+    </div>
+</header>
+
+<main>
+    <div class="instrucoes" id="instrucoes">Atividade avaliativa de informática: uso do mouse.</div>
+    <div id="areaJogo">
+        <div class="telaInicial" id="telaInicial">
+            <h2>🖱️ Avaliação do Uso do Mouse</h2>
+            <p>
+                O aluno poderá tentar várias vezes durante a atividade. O jogo registra pontos, erros e transforma o desempenho em nota de 0 a 2,00.
+            </p>
+            <p>
+                Habilidades avaliadas: clique simples, clique duplo, precisão, selecionar, arrastar e controle do ponteiro.
+            </p>
+
+            <div class="campoNome">
+                <label for="nomeAluno">Nome:</label>
+                <input id="nomeAluno" type="text" placeholder="Digite o nome do aluno">
+            </div>
+
+            <button onclick="iniciarJogo()">Começar avaliação</button>
+            <div class="rodape">Colégio Universitas • Aula de Informática</div>
+        </div>
+
+        <div class="mensagem" id="mensagem"></div>
+    </div>
+</main>
+
+<script>
+const area = document.getElementById("areaJogo");
+const instrucoes = document.getElementById("instrucoes");
+const faseEl = document.getElementById("fase");
+const pontosEl = document.getElementById("pontos");
+const errosEl = document.getElementById("erros");
+const tempoEl = document.getElementById("tempo");
+const notaEl = document.getElementById("nota");
+const alunoPainel = document.getElementById("alunoPainel");
+const telaInicial = document.getElementById("telaInicial");
+const mensagem = document.getElementById("mensagem");
+
+let nomeAluno = "";
+let fase = 0;
+let pontos = 0;
+let erros = 0;
+let tempo = 180;
+let intervaloTempo;
+let acertosNaFase = 0;
+let arrastando = null;
+let offsetX = 0;
+let offsetY = 0;
+let dentroDoCaminho = false;
+
+const PONTOS_MAXIMOS = 500;
+
+const criterios = {
+    clique: {nome: "Clique simples", max: 50, pontos: 0, erros: 0},
+    precisao: {nome: "Precisão", max: 130, pontos: 0, erros: 0},
+    duplo: {nome: "Clique duplo", max: 60, pontos: 0, erros: 0},
+    selecionar: {nome: "Selecionar", max: 80, pontos: 0, erros: 0},
+    arrastar: {nome: "Arrastar", max: 130, pontos: 0, erros: 0},
+    controle: {nome: "Controle do ponteiro", max: 50, pontos: 0, erros: 0}
+};
+
+function iniciarJogo() {
+    const campoNome = document.getElementById("nomeAluno");
+    nomeAluno = campoNome.value.trim() || "Aluno";
+    alunoPainel.textContent = nomeAluno;
+
+    telaInicial.style.display = "none";
+    pontos = 0;
+    erros = 0;
+    fase = 0;
+    tempo = 180;
+
+    Object.keys(criterios).forEach(k => {
+        criterios[k].pontos = 0;
+        criterios[k].erros = 0;
+    });
+
+    atualizarPainel();
+
+    clearInterval(intervaloTempo);
+    intervaloTempo = setInterval(() => {
+        tempo--;
+        tempoEl.textContent = tempo;
+        if (tempo <= 0) {
+            finalizarJogo(false);
+        }
+    }, 1000);
+
+    proximaFase();
+}
+
+function limparArea() {
+    [...area.children].forEach(el => {
+        if (el.id !== "telaInicial" && el.id !== "mensagem") {
+            el.remove();
+        }
+    });
+    mensagem.style.display = "none";
+    area.classList.remove("erroTela");
+    area.onmousemove = null;
+    area.onmousedown = null;
+    area.onmouseup = null;
+}
+
+function calcularNota() {
+    let nota = (pontos / PONTOS_MAXIMOS) * 2;
+    if (nota > 2) nota = 2;
+    if (nota < 0) nota = 0;
+    return nota;
+}
+
+function formatarNota(valor) {
+    return valor.toFixed(2).replace(".", ",");
+}
+
+function atualizarPainel() {
+    faseEl.textContent = fase;
+    pontosEl.textContent = pontos;
+    errosEl.textContent = erros;
+    tempoEl.textContent = tempo;
+    notaEl.textContent = formatarNota(calcularNota());
+}
+
+function adicionarPontos(categoria, valor) {
+    pontos += valor;
+    criterios[categoria].pontos += valor;
+    atualizarPainel();
+}
+
+function registrarErro(categoria) {
+    erros++;
+    if (categoria && criterios[categoria]) criterios[categoria].erros++;
+    atualizarPainel();
+    area.classList.add("erroTela");
+    setTimeout(() => area.classList.remove("erroTela"), 250);
+}
+
+function mostrarMensagem(texto, tempoMsg = 900) {
+    mensagem.innerHTML = texto;
+    mensagem.style.display = "block";
+    setTimeout(() => {
+        mensagem.style.display = "none";
+    }, tempoMsg);
+}
+
+function posicaoAleatoria(tamanho = 90) {
+    const margem = 25;
+    const maxX = area.clientWidth - tamanho - margem;
+    const maxY = area.clientHeight - tamanho - margem;
+    const x = Math.floor(Math.random() * Math.max(1, maxX - margem)) + margem;
+    const y = Math.floor(Math.random() * Math.max(1, maxY - margem)) + margem;
+    return {x, y};
+}
+
+function criarEtiqueta(texto) {
+    const e = document.createElement("div");
+    e.className = "etiqueta";
+    e.textContent = texto;
+    area.appendChild(e);
+}
+
+function proximaFase() {
+    fase++;
+    acertosNaFase = 0;
+    limparArea();
+    atualizarPainel();
+
+    if (fase === 1) faseClique();
+    else if (fase === 2) fasePrecisao1();
+    else if (fase === 3) faseCliqueDuplo();
+    else if (fase === 4) faseSelecionar1();
+    else if (fase === 5) faseSelecionar2();
+    else if (fase === 6) faseArrastar1();
+    else if (fase === 7) faseArrastar2();
+    else if (fase === 8) faseArrastar3();
+    else if (fase === 9) fasePrecisao2();
+    else if (fase === 10) faseLabirinto();
+    else finalizarJogo(true);
+}
+
+function faseClique() {
+    instrucoes.textContent = "Fase 1: clique nos alvos grandes que aparecerem.";
+    criarEtiqueta("Habilidade: clique simples");
+    criarAlvo(5, "grande", "clique", 10);
+}
+
+function fasePrecisao1() {
+    instrucoes.textContent = "Fase 2: clique nos alvos menores. O objetivo é ter precisão.";
+    criarEtiqueta("Habilidade: precisão");
+    criarAlvo(7, "pequeno", "precisao", 10);
+}
+
+function fasePrecisao2() {
+    instrucoes.textContent = "Fase 9: clique nos mini-alvos. Esta é a fase mais difícil de precisão.";
+    criarEtiqueta("Habilidade: precisão avançada");
+    criarAlvo(6, "mini", "precisao", 10);
+}
+
+function criarAlvo(total, tamanho, categoria, valor) {
+    const alvo = document.createElement("div");
+    alvo.className = "alvo";
+    let tam = 90;
+
+    if (tamanho === "pequeno") {
+        alvo.classList.add("alvoPequeno");
+        tam = 62;
+    }
+
+    if (tamanho === "mini") {
+        alvo.classList.add("alvoMini");
+        tam = 46;
+    }
+
+    const p = posicaoAleatoria(tam);
+    alvo.style.left = p.x + "px";
+    alvo.style.top = p.y + "px";
+
+    alvo.onclick = (e) => {
+        e.stopPropagation();
+        adicionarPontos(categoria, valor);
+        acertosNaFase++;
+        alvo.remove();
+
+        if (acertosNaFase >= total) {
+            mostrarMensagem("Muito bem! ✅");
+            setTimeout(proximaFase, 800);
+        } else {
+            criarAlvo(total, tamanho, categoria, valor);
+        }
+    };
+
+    area.onclick = () => {
+        registrarErro(categoria);
+    };
+
+    area.appendChild(alvo);
+}
+
+function faseCliqueDuplo() {
+    instrucoes.textContent = "Fase 3: dê clique duplo nas estrelas. Clique simples não conta.";
+    criarEtiqueta("Habilidade: clique duplo");
+    criarEstrela();
+}
+
+function criarEstrela() {
+    const estrela = document.createElement("div");
+    estrela.className = "estrela";
+    estrela.textContent = "⭐";
+    const p = posicaoAleatoria(72);
+    estrela.style.left = p.x + "px";
+    estrela.style.top = p.y + "px";
+
+    estrela.ondblclick = (e) => {
+        e.stopPropagation();
+        adicionarPontos("duplo", 12);
+        acertosNaFase++;
+        estrela.remove();
+
+        if (acertosNaFase >= 5) {
+            mostrarMensagem("Excelente clique duplo! ⭐");
+            setTimeout(proximaFase, 800);
+        } else {
+            criarEstrela();
+        }
+    };
+
+    estrela.onclick = (e) => {
+        e.stopPropagation();
+        registrarErro("duplo");
+    };
+
+    area.appendChild(estrela);
+}
+
+function faseSelecionar1() {
+    instrucoes.textContent = "Fase 4: selecione apenas os itens pedidos: TECLADO, MOUSE e MONITOR.";
+    criarEtiqueta("Habilidade: selecionar itens corretos");
+    const itens = [
+        ["TECLADO", true, 10, 80],
+        ["CADERNO", false, 250, 80],
+        ["MOUSE", true, 460, 80],
+        ["LÁPIS", false, 680, 80],
+        ["MONITOR", true, 160, 230],
+        ["BOLA", false, 410, 230]
+    ];
+    criarSelecao(itens, 3, "selecionar", 12);
+}
+
+function faseSelecionar2() {
+    instrucoes.textContent = "Fase 5: selecione somente as figuras iguais ao modelo: 🟦.";
+    criarEtiqueta("Habilidade: selecionar por comparação visual");
+    const itens = [
+        ["🟦", true, 90, 80],
+        ["🟨", false, 260, 80],
+        ["🟦", true, 430, 80],
+        ["🟥", false, 600, 80],
+        ["🟩", false, 180, 230],
+        ["🟦", true, 360, 230],
+        ["🟪", false, 540, 230]
+    ];
+    criarSelecao(itens, 3, "selecionar", 14);
+}
+
+function criarSelecao(itens, totalCorretos, categoria, valor) {
+    itens.forEach(([texto, correto, x, y]) => {
+        const div = document.createElement("div");
+        div.className = "selecionavel";
+        div.textContent = texto;
+        div.style.left = x + "px";
+        div.style.top = y + "px";
+        div.dataset.correto = correto ? "sim" : "nao";
+        div.dataset.marcado = "nao";
+
+        div.onclick = () => {
+            if (div.dataset.marcado === "sim") return;
+
+            div.dataset.marcado = "sim";
+
+            if (div.dataset.correto === "sim") {
+                div.classList.add("selecionado");
+                adicionarPontos(categoria, valor);
+                acertosNaFase++;
+
+                if (acertosNaFase >= totalCorretos) {
+                    mostrarMensagem("Seleção correta! ✅");
+                    setTimeout(proximaFase, 850);
+                }
+            } else {
+                div.classList.add("errado");
+                registrarErro(categoria);
+            }
+        };
+
+        area.appendChild(div);
+    });
+}
+
+function faseArrastar1() {
+    instrucoes.textContent = "Fase 6: arraste os objetos para dentro da área verde.";
+    criarEtiqueta("Habilidade: arrastar objetos grandes");
+    criarArrastarEmoji(["🍎", "📚", "✏️"], false, "arrastar", 15);
+}
+
+function faseArrastar2() {
+    instrucoes.textContent = "Fase 7: arraste cada palavra para a caixa correta.";
+    criarEtiqueta("Habilidade: arrastar e soltar com classificação");
+
+    const zonas = [
+        ["ANIMAL", 630, 80],
+        ["MATERIAL", 630, 270]
+    ];
+
+    zonas.forEach(([texto, x, y]) => {
+        const z = document.createElement("div");
+        z.className = "zona";
+        z.textContent = texto;
+        z.style.left = x + "px";
+        z.style.top = y + "px";
+        z.dataset.tipo = texto;
+        area.appendChild(z);
+    });
+
+    const itens = [
+        ["GATO", "ANIMAL", 80, 80],
+        ["LÁPIS", "MATERIAL", 80, 190],
+        ["CACHORRO", "ANIMAL", 280, 80],
+        ["BORRACHA", "MATERIAL", 280, 190]
+    ];
+
+    itens.forEach(([texto, tipo, x, y]) => {
+        const caixa = document.createElement("div");
+        caixa.className = "caixa caixaTexto";
+        caixa.textContent = texto;
+        caixa.style.left = x + "px";
+        caixa.style.top = y + "px";
+        caixa.dataset.tipo = tipo;
+        caixa.dataset.ok = "nao";
+        prepararArraste(caixa, true);
+        area.appendChild(caixa);
+    });
+
+    ativarSoltarPorTipo("arrastar", 18, 4);
+}
+
+function faseArrastar3() {
+    instrucoes.textContent = "Fase 8: arraste os objetos pequenos para as áreas verdes. Exige mais precisão.";
+    criarEtiqueta("Habilidade: arrastar com precisão");
+
+    const posZonas = [
+        [620, 55],
+        [620, 235],
+        [430, 145]
+    ];
+
+    posZonas.forEach((pos, i) => {
+        const z = document.createElement("div");
+        z.className = "zona zonaPequena";
+        z.textContent = "Solte aqui";
+        z.style.left = pos[0] + "px";
+        z.style.top = pos[1] + "px";
+        z.dataset.tipo = "livre";
+        area.appendChild(z);
+    });
+
+    const emojis = ["🔵", "🟢", "🟣"];
+    emojis.forEach((emoji, i) => {
+        const caixa = document.createElement("div");
+        caixa.className = "caixa";
+        caixa.textContent = emoji;
+        caixa.style.width = "72px";
+        caixa.style.height = "72px";
+        caixa.style.fontSize = "34px";
+        caixa.style.left = "90px";
+        caixa.style.top = (75 + i * 110) + "px";
+        caixa.dataset.ok = "nao";
+        caixa.dataset.tipo = "livre";
+        prepararArraste(caixa, false);
+        area.appendChild(caixa);
+    });
+
+    ativarSoltarLivre("arrastar", 18, 3);
+}
+
+function criarArrastarEmoji(emojis, zonasPequenas, categoria, valor) {
+    const zona = document.createElement("div");
+    zona.className = zonasPequenas ? "zona zonaPequena" : "zona";
+    zona.textContent = "Solte aqui";
+    zona.style.right = "80px";
+    zona.style.top = "calc(50% - 85px)";
+    zona.dataset.tipo = "livre";
+    area.appendChild(zona);
+
+    emojis.forEach((emoji, i) => {
+        const caixa = document.createElement("div");
+        caixa.className = "caixa";
+        caixa.textContent = emoji;
+        caixa.style.left = "90px";
+        caixa.style.top = (75 + i * 120) + "px";
+        caixa.dataset.ok = "nao";
+        caixa.dataset.tipo = "livre";
+        prepararArraste(caixa, false);
+        area.appendChild(caixa);
+    });
+
+    ativarSoltarLivre(categoria, valor, emojis.length);
+}
+
+function prepararArraste(caixa, texto) {
+    caixa.onmousedown = (e) => {
+        if (caixa.dataset.ok === "sim") return;
+        arrastando = caixa;
+        const r = caixa.getBoundingClientRect();
+        offsetX = e.clientX - r.left;
+        offsetY = e.clientY - r.top;
+        caixa.style.cursor = "grabbing";
+        caixa.style.zIndex = 10;
+    };
+}
+
+function ativarSoltarLivre(categoria, valor, total) {
+    area.onmousemove = (e) => {
+        if (!arrastando) return;
+        const rect = area.getBoundingClientRect();
+        arrastando.style.left = (e.clientX - rect.left - offsetX) + "px";
+        arrastando.style.top = (e.clientY - rect.top - offsetY) + "px";
+    };
+
+    area.onmouseup = () => {
+        if (!arrastando) return;
+
+        const zonas = [...document.querySelectorAll(".zona")];
+        const r1 = arrastando.getBoundingClientRect();
+
+        const dentro = zonas.some(zona => {
+            const r2 = zona.getBoundingClientRect();
+            return !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+        });
+
+        if (dentro && arrastando.dataset.ok === "nao") {
+            arrastando.dataset.ok = "sim";
+            arrastando.style.background = "#caffbf";
+            arrastando.style.borderColor = "#2a9d8f";
+            arrastando.style.cursor = "default";
+            adicionarPontos(categoria, valor);
+            acertosNaFase++;
+
+            if (acertosNaFase >= total) {
+                mostrarMensagem("Arrastar concluído! 👏");
+                setTimeout(proximaFase, 850);
+            }
+        } else {
+            registrarErro(categoria);
+        }
+
+        if (arrastando) {
+            arrastando.style.cursor = "grab";
+            arrastando.style.zIndex = 5;
+        }
+        arrastando = null;
+    };
+}
+
+function ativarSoltarPorTipo(categoria, valor, total) {
+    area.onmousemove = (e) => {
+        if (!arrastando) return;
+        const rect = area.getBoundingClientRect();
+        arrastando.style.left = (e.clientX - rect.left - offsetX) + "px";
+        arrastando.style.top = (e.clientY - rect.top - offsetY) + "px";
+    };
+
+    area.onmouseup = () => {
+        if (!arrastando) return;
+
+        const zonas = [...document.querySelectorAll(".zona")];
+        const r1 = arrastando.getBoundingClientRect();
+
+        let zonaCorreta = false;
+
+        zonas.forEach(zona => {
+            const r2 = zona.getBoundingClientRect();
+            const dentro = !(r1.right < r2.left || r1.left > r2.right || r1.bottom < r2.top || r1.top > r2.bottom);
+            if (dentro && zona.dataset.tipo === arrastando.dataset.tipo) {
+                zonaCorreta = true;
+            }
+        });
+
+        if (zonaCorreta && arrastando.dataset.ok === "nao") {
+            arrastando.dataset.ok = "sim";
+            arrastando.style.background = "#caffbf";
+            arrastando.style.borderColor = "#2a9d8f";
+            arrastando.style.cursor = "default";
+            adicionarPontos(categoria, valor);
+            acertosNaFase++;
+
+            if (acertosNaFase >= total) {
+                mostrarMensagem("Classificação correta! ✅");
+                setTimeout(proximaFase, 850);
+            }
+        } else {
+            registrarErro(categoria);
+        }
+
+        if (arrastando) {
+            arrastando.style.cursor = "grab";
+            arrastando.style.zIndex = 5;
+        }
+        arrastando = null;
+    };
+}
+
+function faseLabirinto() {
+    instrucoes.textContent = "Fase 10: leve o mouse do INÍCIO até o FIM sem sair do caminho azul.";
+    criarEtiqueta("Habilidade: controle do ponteiro");
+
+    const lab = document.createElement("div");
+    lab.className = "labirinto";
+    area.appendChild(lab);
+
+    const c1 = criarCaminho("80px", "calc(50% - 35px)", "28%", "70px", lab);
+    const c2 = criarCaminho("34%", "calc(50% - 35px)", "70px", "35%", lab);
+    const c3 = criarCaminho("34%", "21%", "32%", "70px", lab);
+    const c4 = criarCaminho("63%", "21%", "70px", "47%", lab);
+    const c5 = criarCaminho("63%", "58%", "25%", "70px", lab);
+
+    const inicio = document.createElement("div");
+    inicio.className = "inicio";
+    inicio.textContent = "INÍCIO";
+    lab.appendChild(inicio);
+
+    const fim = document.createElement("div");
+    fim.className = "fim";
+    fim.textContent = "FIM";
+    lab.appendChild(fim);
+
+    const caminhos = [c1, c2, c3, c4, c5, inicio, fim];
+
+    inicio.onmouseenter = () => {
+        dentroDoCaminho = true;
+        mostrarMensagem("Agora vá até o FIM!", 650);
+    };
+
+    lab.onmousemove = (e) => {
+        if (!dentroDoCaminho) return;
+
+        const sobreCaminho = caminhos.some(c => {
+            const r = c.getBoundingClientRect();
+            return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+        });
+
+        if (!sobreCaminho) {
+            dentroDoCaminho = false;
+            registrarErro("controle");
+            mostrarMensagem("Ops! Volte ao início.", 750);
+        }
+    };
+
+    fim.onmouseenter = () => {
+        if (dentroDoCaminho) {
+            adicionarPontos("controle", 50);
+            dentroDoCaminho = false;
+            mostrarMensagem("Desafio concluído! 🏆");
+            setTimeout(proximaFase, 950);
+        }
+    };
+}
+
+function criarCaminho(left, top, width, height, lab) {
+    const c = document.createElement("div");
+    c.className = "caminho";
+    c.style.left = left;
+    c.style.top = top;
+    c.style.width = width;
+    c.style.height = height;
+    lab.appendChild(c);
+    return c;
+}
+
+function nivelPorNota(nota) {
+    if (nota >= 1.75) return ["Avançado", "Demonstra excelente domínio do mouse, com precisão, autonomia e segurança."];
+    if (nota >= 1.25) return ["Adequado", "Demonstra bom domínio do mouse, realizando a maioria das ações com autonomia."];
+    if (nota >= 0.75) return ["Básico", "Realiza ações principais, mas ainda precisa melhorar precisão e controle."];
+    return ["Inicial", "Necessita de apoio frequente para executar ações básicas com o mouse."];
+}
+
+function nivelCategoria(p, max) {
+    const perc = max === 0 ? 0 : p / max;
+    if (perc >= 0.85) return "Avançado";
+    if (perc >= 0.60) return "Adequado";
+    if (perc >= 0.35) return "Básico";
+    return "Inicial";
+}
+
+function finalizarJogo(concluiu = false) {
+    clearInterval(intervaloTempo);
+    limparArea();
+
+    const notaFinal = calcularNota();
+    const [nivel, descricao] = nivelPorNota(notaFinal);
+
+    const linhas = Object.keys(criterios).map(k => {
+        const c = criterios[k];
+        return `
+            <tr>
+                <td>${c.nome}</td>
+                <td>${c.pontos}/${c.max}</td>
+                <td>${c.erros}</td>
+                <td>${nivelCategoria(c.pontos, c.max)}</td>
+            </tr>
+        `;
+    }).join("");
+
+    const telaFinal = document.createElement("div");
+    telaFinal.className = "telaFinal";
+    telaFinal.innerHTML = `
+        <h2>${concluiu ? "Avaliação concluída!" : "Tempo encerrado!"}</h2>
+        <p><strong>Aluno:</strong> ${nomeAluno}</p>
+        <p class="notaFinal">Nota: ${formatarNota(notaFinal)} / 2,00</p>
+        <p><strong>Nível de proficiência:</strong> ${nivel}</p>
+        <p>${descricao}</p>
+
+        <table class="resumo">
+            <thead>
+                <tr>
+                    <th>Habilidade</th>
+                    <th>Pontos</th>
+                    <th>Erros</th>
+                    <th>Nível</th>
+                </tr>
+            </thead>
+            <tbody>${linhas}</tbody>
+        </table>
+
+        <button onclick="location.reload()">Nova tentativa</button>
+        <div class="rodape">Critérios: clique simples, precisão, clique duplo, seleção, arrastar e controle do ponteiro.</div>
+    `;
+
+    area.appendChild(telaFinal);
+    instrucoes.textContent = "Resultado da atividade avaliativa.";
+    faseEl.textContent = "10";
+    notaEl.textContent = formatarNota(notaFinal);
+}
+</script>
+
+</body>
+</html>
